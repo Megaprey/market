@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:market
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      data-source-properties:
+        useUnicode: true
+        characterEncoding: UTF-8
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.yaml
