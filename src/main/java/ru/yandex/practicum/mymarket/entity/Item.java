@@ -2,14 +2,16 @@ package ru.yandex.practicum.mymarket.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "items")
 public class Item {
     @Id
@@ -33,8 +35,21 @@ public class Item {
     @Column(name = "img_path")
     private String imgPath;
 
-    @Column(name = "cart_flg")
-    private boolean cartFlg;
+    @ToString.Exclude
+    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Order order;
+
+    @Column(name = "check_order")
+    private boolean checkOrder;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
 
     public Long getId() {
         return id;
@@ -63,4 +78,25 @@ public class Item {
     public void setCount(int count) {
         this.count = count;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
 }

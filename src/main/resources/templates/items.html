@@ -69,17 +69,12 @@
                                 <input type="hidden" name="sort" th:value="${sort}">
                                 <input type="hidden" name="pageSize" th:value="${paging.getPageSize()}">
                                 <input type="hidden" name="pageNumber" th:value="${paging.getPageNumber()}">
-                                <button type="submit" class="btn btn-outline-secondary" name="action" value="MINUS">-</button>
+                                <button type="submit" class="btn btn-outline-secondary" name="action" value="MINUS" th:if="${item.getCount()!=0}">-</button>
                                 <span th:text="${item.getCount()}"></span>
                                 <button type="submit" class="btn btn-outline-secondary" name="action" value="PLUS">+</button>
                                 <button type="submit" class="btn btn-warning ms-auto bi bi-cart4" name="action" value="PLUS" th:if="${item.getCount()==0}"></button>
                             </div>
                         </form>
-                    </div>
-                    <div class="d-grid">
-                        <button class="btn add-to-cart-btn text-black">
-                            <i class="bi bi-cart-plus">Добавить в корзину</i>
-                        </button>
                     </div>
                 </div>
                 <div th:unless="${item.getId() != -1}">&nbsp;</div>

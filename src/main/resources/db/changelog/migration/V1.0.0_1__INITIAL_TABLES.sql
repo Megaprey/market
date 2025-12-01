@@ -4,9 +4,10 @@ create table items
     title                     varchar(255) not null,
     description               varchar(255) not null,
     price                     numeric not null,
-    count_item                integer not null,
+    count_item                integer null,
     img_path                  varchar(255) not null,
-    cart_flg                  boolean not null,
+    order_id                  integer    not null,
+    check_order               boolean    not null default false,
 
     constraint items_id primary key (id)
 );
@@ -14,11 +15,9 @@ create table items
 create table orders
 (
     id                        bigserial    not null,
-    totalSum                  numeric not null,
-    count_item                integer not null,
-    items_id                   bigserial    not null,
+    total_sum                  numeric not null,
 
     constraint orders_id primary key (id),
-    constraint orders_items_id foreign key (items_id)
+    constraint orders_item_id foreign key (id)
             references items (id)
 );

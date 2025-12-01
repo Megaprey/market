@@ -1,17 +1,26 @@
 package ru.yandex.practicum.mymarket.entity;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.*;
 
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.List;
 
+@Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Table(name = "orders")
+@Getter
+@Setter
 public class Order {
     @Id
     @GeneratedValue(
@@ -19,13 +28,11 @@ public class Order {
     )
     private Long id;
 
-    @Column(name = "totalSum")
-    private String totalSum;
+    @Column(name = "total_sum")
+    private BigDecimal totalSum;
 
-    @Column(name = "count_item")
-    private String count;
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Item> items;
 
-    @JoinColumn(name = "item_id", referencedColumnName = "id")
-    @OneToMany(targetEntity = Item.class, cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<Item> items;
+
 }
