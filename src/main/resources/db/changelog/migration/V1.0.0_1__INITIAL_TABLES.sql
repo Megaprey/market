@@ -5,8 +5,8 @@ create table items
     description               varchar(255) not null,
     price                     numeric not null,
     count_item                integer null,
-    img_path                  varchar(255) not null,
-    order_id                  integer    not null,
+    img_path                  varchar(255) null,
+    order_id                  integer    null,
     check_order               boolean    not null default false,
 
     constraint items_id primary key (id)
@@ -17,7 +17,5 @@ create table orders
     id                        bigserial    not null,
     total_sum                  numeric not null,
 
-    constraint orders_id primary key (id),
-    constraint orders_item_id foreign key (id)
-            references items (id)
+    constraint orders_id primary key (id)
 );

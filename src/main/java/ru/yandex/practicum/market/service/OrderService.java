@@ -1,9 +1,9 @@
-package ru.yandex.practicum.mymarket.service;
+package ru.yandex.practicum.market.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.mymarket.entity.Order;
-import ru.yandex.practicum.mymarket.repository.OrderRepository;
+import ru.yandex.practicum.market.entity.Order;
+import ru.yandex.practicum.market.repository.OrderRepository;
 
 import java.util.List;
 

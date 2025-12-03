@@ -1,8 +1,8 @@
-package ru.yandex.practicum.mymarket.util;
+package ru.yandex.practicum.market.util;
 
 import org.springframework.data.domain.Page;
-import ru.yandex.practicum.mymarket.dto.ItemDto;
-import ru.yandex.practicum.mymarket.entity.Item;
+import ru.yandex.practicum.market.dto.ItemDto;
+import ru.yandex.practicum.market.entity.Item;
 
 import java.math.BigDecimal;
 

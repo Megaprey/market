@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mymarket.entity;
+package ru.yandex.practicum.market.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class Item {
     private String imgPath;
 
     @ToString.Exclude
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = true)
     @ManyToOne(fetch = FetchType.LAZY)
     private Order order;
 

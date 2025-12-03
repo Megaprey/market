@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mymarket.entity;
+package ru.yandex.practicum.market.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

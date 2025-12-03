@@ -1,12 +1,12 @@
-package ru.yandex.practicum.mymarket.controller;
+package ru.yandex.practicum.market.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.mymarket.entity.Order;
-import ru.yandex.practicum.mymarket.service.OrderService;
-import ru.yandex.practicum.mymarket.service.ShopService;
+import ru.yandex.practicum.market.entity.Order;
+import ru.yandex.practicum.market.service.OrderService;
+import ru.yandex.practicum.market.service.ShopService;
 
 import java.math.BigDecimal;
 import java.util.List;

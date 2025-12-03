@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mymarket.service;
+package ru.yandex.practicum.market.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -6,17 +6,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.mymarket.dto.ItemDto;
-import ru.yandex.practicum.mymarket.entity.Item;
-import ru.yandex.practicum.mymarket.repository.ItemRepository;
-import ru.yandex.practicum.mymarket.util.Cart;
+import ru.yandex.practicum.market.dto.ItemDto;
+import ru.yandex.practicum.market.entity.Item;
+import ru.yandex.practicum.market.repository.ItemRepository;
+import ru.yandex.practicum.market.util.Cart;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.mymarket.util.Utils.mapItemToItemDto;
+import static ru.yandex.practicum.market.util.Utils.mapItemToItemDto;
 
 @Service
 @AllArgsConstructor

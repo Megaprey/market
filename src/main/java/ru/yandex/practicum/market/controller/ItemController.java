@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mymarket.controller;
+package ru.yandex.practicum.market.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -6,12 +6,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.yandex.practicum.mymarket.dto.ItemDto;
-import ru.yandex.practicum.mymarket.service.ItemService;
-import ru.yandex.practicum.mymarket.util.Paging;
-import ru.yandex.practicum.mymarket.util.Cart;
+import ru.yandex.practicum.market.dto.ItemDto;
+import ru.yandex.practicum.market.service.ItemService;
+import ru.yandex.practicum.market.util.Paging;
+import ru.yandex.practicum.market.util.Cart;
 
-import static ru.yandex.practicum.mymarket.util.Utils.mapItemToItemDto;
+import static ru.yandex.practicum.market.util.Utils.mapItemToItemDto;
 
 
 @Controller

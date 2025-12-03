@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mymarket.util;
+package ru.yandex.practicum.market.util;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 

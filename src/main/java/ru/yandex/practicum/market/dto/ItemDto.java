@@ -1,4 +1,4 @@
-package ru.yandex.practicum.mymarket.dto;
+package ru.yandex.practicum.market.dto;
 
 import lombok.Builder;
 

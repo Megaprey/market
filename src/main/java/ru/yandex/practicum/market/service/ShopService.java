@@ -1,13 +1,13 @@
-package ru.yandex.practicum.mymarket.service;
+package ru.yandex.practicum.market.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.mymarket.entity.Item;
-import ru.yandex.practicum.mymarket.entity.Order;
-import ru.yandex.practicum.mymarket.repository.ItemRepository;
-import ru.yandex.practicum.mymarket.repository.OrderRepository;
-import ru.yandex.practicum.mymarket.util.Cart;
+import ru.yandex.practicum.market.entity.Item;
+import ru.yandex.practicum.market.entity.Order;
+import ru.yandex.practicum.market.repository.ItemRepository;
+import ru.yandex.practicum.market.repository.OrderRepository;
+import ru.yandex.practicum.market.util.Cart;
 
 import java.math.BigDecimal;
 import java.util.List;
