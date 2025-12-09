@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0_1__INITIAL_TABLES
+      author: Razzhivin Igor
+      changes:
+        - sqlFile:
+            path: db/changelog/migration/V1.0.0_1__INITIAL_TABLES.sql
+        - tagDatabase:
+            tag: 1
+      rollback:
+        - sqlFile:
+            path: db/changelog/undoing/U1.0.0_1__INITIAL_TABLES.sql
+  - changeSet:
+      id: V1.0.0_2__ADD_ITEMS
+      author: Razzhivin Igor
+      changes:
+        - sqlFile:
+            path: db/changelog/migration/V1.0.0_2__ADD_ITEMS.sql
+        - tagDatabase:
+            tag: 2
+      rollback:
+        - sqlFile:
+            path: db/changelog/undoing/U1.0.0_2__ADD_ITEMS.sql
