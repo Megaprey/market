@@ -1,54 +1,61 @@
 package ru.yandex.practicum.market.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "items")
+@Table("items")
 public class Item {
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
     private Long id;
 
-    @Column(name = "title")
+    @Column("title")
     private String title;
 
-    @Column(name = "description")
+    @Column("description")
     private String description;
 
-    @Column(name = "price")
+    @Column("price")
     private BigDecimal price;
 
-    @Column(name = "count_item")
+    @Column("count_item")
     private int count;
 
-    @Column(name = "img_path")
+    @Column("img_path")
     private String imgPath;
 
-    @ToString.Exclude
-    @JoinColumn(name = "order_id", referencedColumnName = "id", nullable = true)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column("order_id")
+    private Long orderId;
+
+    @Column("check_order")
+    private boolean checkOrder;
+
+    @Transient
     private Order order;
 
-    @Column(name = "check_order")
-    private boolean checkOrder;
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public Order getOrder() {
-        return order;
+    public Long getOrderId() {
+        return orderId;
     }
 
     public Long getId() {
@@ -95,8 +102,8 @@ public class Item {
         this.imgPath = imgPath;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderId(Order order) {
+        this.orderId = orderId;
     }
 
 }

@@ -1,16 +1,17 @@
 package ru.yandex.practicum.market.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.yandex.practicum.market.dto.ItemDto;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+import ru.yandex.practicum.market.dto.HandleItemDto;
 import ru.yandex.practicum.market.service.ItemService;
 import ru.yandex.practicum.market.util.Paging;
 import ru.yandex.practicum.market.util.Cart;
 
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static ru.yandex.practicum.market.util.Utils.mapItemToItemDto;
 
 
@@ -19,54 +20,73 @@ import static ru.yandex.practicum.market.util.Utils.mapItemToItemDto;
 @AllArgsConstructor
 public class ItemController {
     private ItemService itemService;
-    private Cart cart;
 
     @GetMapping("/{id}")
-    public String getItem(@PathVariable Long id,
-                          Model model) {
-        model.addAttribute("item", mapItemToItemDto(itemService.findById(id).get(), cart));
-
-        return "item";
+    public Mono<String> getItem(@PathVariable Long id,
+                                Model model) {
+        Cart cart = new Cart();
+        return itemService.findById(id)
+                .doOnNext(item -> model.addAttribute("item", mapItemToItemDto(item, cart)))
+                .thenReturn("item");
     }
 
     @GetMapping()
-    public String getItems(
+    public Mono<String> getItems(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "NO") String sort,
             @RequestParam(defaultValue = "1") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,
-            Model model) {
-        Page<ItemDto> itemPage = itemService.getPageItems(cart, pageNumber - 1, pageSize, search, sort);
+            Model model,
+            ServerWebExchange exchange) {
+        return exchange.getSession()
+                .flatMap(session -> {
+                    // Получаем корзину из сессии или создаем новую
+                    Cart cartFromSession = session.getAttribute("cart");
+                    Cart cart = cartFromSession != null ? cartFromSession : new Cart();
 
-        Paging paging = new Paging(itemPage.getNumber() + 1,
-                pageSize,
-                itemPage.getTotalElements());
 
-        model.addAttribute("items", itemPage.getContent());
-        model.addAttribute("paging", paging);
-        model.addAttribute("search", search);
-        model.addAttribute("sort", sort);
 
-        return "items";
+                    // Получаем страницу товаров
+                    return itemService.getPageItems(cart, pageNumber - 1, pageSize, search, sort)
+                            .flatMap(itemPage -> {
+                                // Сохраняем корзину обратно в сессию
+                                session.getAttributes().put("cart", cart);
+                                // Создаем пагинацию
+                                Paging paging = new Paging(
+                                        itemPage.getNumber() + 1,
+                                        pageSize,
+                                        itemPage.getTotalElements()
+                                );
+
+                                // Устанавливаем атрибуты модели
+                                model.addAttribute("items", itemPage.getContent());
+                                model.addAttribute("paging", paging);
+                                model.addAttribute("search", search);
+                                model.addAttribute("sort", sort);
+                                model.addAttribute("cart", cart);
+
+                                // Возвращаем имя представления
+                                return Mono.just("items");
+                            });
+                });
     }
 
-    @PostMapping
-    public String handleItemAction(
-            @RequestParam Long id,
-            @RequestParam String action,
-            @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "NO") String sort,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "1") int pageNumber,
-            RedirectAttributes redirectAttributes) {
-        cart.handleItemAction(action, id);
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    public Mono<String> handleItemAction(
+            @RequestBody HandleItemDto handleItemDto,
+            ServerWebExchange exchange) {
+        return exchange.getSession()
+                .doOnNext(session -> {
+                    Cart cart = session.getAttribute("cart");
+                    cart.handleItemAction(handleItemDto.getAction(), handleItemDto.getId());
 
-        redirectAttributes.addAttribute("search", search);
-        redirectAttributes.addAttribute("sort", sort);
-        redirectAttributes.addAttribute("pageSize", pageSize);
-        redirectAttributes.addAttribute("pageNumber", pageNumber);
-
-        return "redirect:/items";
+                    session.getAttributes().put("flash.search", handleItemDto.getSearch());
+                    session.getAttributes().put("flash.sort", handleItemDto.getSort());
+                    session.getAttributes().put("flash.pageSize", handleItemDto.getPageSize());
+                    session.getAttributes().put("flash.pageNumber", handleItemDto.getPageNumber());
+                    session.getAttributes().put("cart", cart);
+                })
+                .thenReturn("redirect:/items");
     }
 
 }

@@ -4,12 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.market.entity.Order;
+import reactor.core.publisher.Mono;
 import ru.yandex.practicum.market.service.OrderService;
 import ru.yandex.practicum.market.service.ShopService;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Controller
 @RequestMapping("/orders")
@@ -18,55 +17,33 @@ public class OrderController {
     private OrderService orderService;
     private ShopService shopService;
 
-//    @GetMapping()
-//    public String getItems(
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "10") int size,
-//            Model model) {
-//
-//        Page<Order> itemPage = oderService.findAll(PageRequest.of(page, size));
-//
-//        Paging paging = new Paging(1,
-//                2,
-//                2);
-//
-//        model.addAttribute("items", itemPage.getContent());
-//        model.addAttribute("paging", paging);
-//
-//        return "items";
-//    }
-
     @PostMapping("/buy")
-    public String buy(
+    public Mono<String> buy(
             @RequestParam(name = "total") BigDecimal totalSum,
             Model model
         ) {
-        Order order = shopService.buy(totalSum);
-
-        model.addAttribute("order", order);
-
-        return "order";
+        return shopService.buy(totalSum)
+                .doOnNext(order -> model.addAttribute("order", order))
+                .thenReturn("order");
     }
 
     @GetMapping
-    public String getOrders(
+    public Mono<String> getOrders(
             Model model
     ) {
-        List<Order> orders = orderService.findAll();
-        model.addAttribute("orders", orders);
-
-        return "orders";
+        return orderService.findAll()
+                .collectList()
+                .doOnNext(orders -> model.addAttribute("orders", orders))
+                .then(Mono.just("orders"));
     }
 
     @GetMapping("/{id}")
-    public String getOrder(
+    public Mono<String> getOrder(
             @PathVariable(name = "id") Long orderId,
             Model model
     ) {
-        Order order = orderService.findById(orderId);
-
-        model.addAttribute("order", order);
-
-        return "order";
+        return orderService.findById(orderId)
+                .doOnSuccess(order -> model.addAttribute("order", order))
+                .thenReturn("order");
     }
 }

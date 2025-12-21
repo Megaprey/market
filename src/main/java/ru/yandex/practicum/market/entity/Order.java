@@ -1,37 +1,32 @@
 package ru.yandex.practicum.market.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Builder
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "orders")
+@Table("orders")
 @Getter
 @Setter
 public class Order {
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
     private Long id;
 
-    @Column(name = "total_sum")
+    @Column("total_sum")
     private BigDecimal totalSum;
 
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Transient
     private List<Item> items;
 
 

@@ -1,12 +1,10 @@
 package ru.yandex.practicum.market.util;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Component
-@SessionScope
 public class Cart {
     private HashMap<Long, Short>  mapItemInCart = new HashMap<>();
 
