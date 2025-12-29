@@ -18,12 +18,11 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class ShopService {
-    Cart cart;
     ItemRepository itemRepository;
     OrderRepository orderRepository;
 
     @Transactional
-    public Mono<Order> buy(BigDecimal totalSum) {
+    public Mono<Order> buy(BigDecimal totalSum, Cart cart) {
         return Flux.fromIterable(cart.getIds())
                 .collectList()
                 .flatMapMany(ids -> itemRepository.findAllById(ids))

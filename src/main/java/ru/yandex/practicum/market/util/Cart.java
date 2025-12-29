@@ -14,8 +14,12 @@ public class Cart {
     }
 
     public void lessItem(Long id) {
-        mapItemInCart.put(id, mapItemInCart.containsKey(id) && mapItemInCart.get(id) >= 1 ? (short)(mapItemInCart.get(id) - 1)
-                : 1);
+        if(mapItemInCart.containsKey(id) && (mapItemInCart.get(id) == 1)) {
+            mapItemInCart.remove(id);
+        } else {
+            mapItemInCart.put(id, mapItemInCart.containsKey(id) && mapItemInCart.get(id) >= 1 ? (short) (mapItemInCart.get(id) - 1)
+                    : 1);
+        }
     }
 
     public Short getItemCount(Long id) {
