@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: my-market-app
-  config:
-    import:
-      - classpath:application-db.yml

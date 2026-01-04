@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16
@@ -14,6 +12,16 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
+  redis:
+    image: redis:7.4-alpine # Use the official Redis image, alpine is lightweight
+    restart: always
+    ports:
+      - "6379:6379" # Maps port 6379 on the host to port 6379 in the container
+    volumes:
+      - redis_data:/data # Persist data in a named volume
 
 volumes:
   postgres-data:
+  redis_data:
+    driver: local
+

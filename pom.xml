@@ -12,7 +12,8 @@
 	<groupId>ru.yandex.practicum</groupId>
 	<artifactId>my-market-app</artifactId>
 	<version>0.0.5</version>
-	<name>my-market-app</name>
+    <packaging>pom</packaging>
+    <name>my-market-app</name>
 	<description>My Market Application</description>
 	<url/>
 	<licenses>
@@ -21,7 +22,11 @@
 	<developers>
 		<developer/>
 	</developers>
-	<scm>
+    <modules>
+		<module>showcase</module>
+		<module>wallet</module>
+	</modules>
+    <scm>
 		<connection/>
 		<developerConnection/>
 		<tag/>
@@ -131,6 +136,11 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-r2dbc</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <title>Витрина магазина</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body class="bg-light">
+<div class="container p-2">
+    <div class="row p-2">
+        <div class="col">
+            <div class="hstack gap-3">
+                <h2>
+                    <span class="badge text-bg-success">Витрина магазина</span>
+                </h2>
+                <a href="/orders" class="btn btn-secondary ms-auto bi bi-file-earmark-text"> Заказы</a>
+                <a href="/items" class="btn btn-secondary bi bi-arrow-left-square"> Главная</a>
+            </div>
+        </div>
+    </div>
+    <div class="row p-2" th:each="item : ${items}">
+        <div class="col">
+            <div class="card">
+                <img class="p-2" th:src="${'/'+item.getImgPath()}" alt="Нет изображения" width="300" height="300">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${item.getTitle()}"></h5>
+                    <h5>
+                        <span class="badge text-bg-success justify-content-end" th:text="${item.getPrice()}+' руб.'"></span>
+                    </h5>
+                    <p class="card-text" th:text="${item.getDescription()}"></p>
+                    <form th:action="@{/cart/items}" method="post" th:id="'cartForm_' + ${item.getId()}" class="cartForm">
+                        <div class="hstack gap-3">
+                            <input type="hidden" name="id" th:value="${item.getId()}">
+                            <input type="hidden" name="search" th:value="${search}">
+                            <input type="hidden" name="sort" th:value="${sort}">
+                            <input type="hidden" name="pageSize" th:value="${paging.getPageSize()}">
+                            <input type="hidden" name="pageNumber" th:value="${paging.getPageNumber()}">
+                            <button type="button" class="btn btn-outline-secondary actionButton" name="action" value="MINUS" th:if="${item.getCount()!=0}">-</button>
+                            <span th:text="${item.getCount()}"></span>
+                            <button type="button" class="btn btn-outline-secondary actionButton" name="action" value="PLUS">+</button>
+                            <button type="button" class="btn btn-warning ms-auto bi bi-cart4 actionButton" name="action" value="PLUS" th:if="${item.getCount()==0}"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row p-2">
+        <div class="col">
+            <form action="/orders/buy" method="post" th:if="${!items.isEmpty()}" class="buyForm">
+                <div class="hstack gap-3">
+                    <input type="hidden" name="total" th:value="${total}">
+                    <h2 th:text="'Итого: '+${total}+' руб.'"/>
+                    <button type="button" class="btn btn-warning ms-auto buyButton">Купить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Проверяем доступность кошелька и баланс
+        checkWalletAndBalance();
+
+        // Проверяем каждые 30 секунд (опционально)
+        setInterval(checkWalletAndBalance, 30000);
+
+        $('.actionButton').click(function() {
+            var form = $(this).closest('.cartForm');
+            var action = $(this).val();
+
+            var data = {
+                id: form.find('input[name="id"]').val(),
+                search: form.find('input[name="search"]').val(),
+                sort: form.find('input[name="sort"]').val(),
+                pageSize: parseInt(form.find('input[name="pageSize"]').val(), 10),
+                pageNumber: parseInt(form.find('input[name="pageNumber"]').val(), 10),
+                action: action
+            };
+
+            $.ajax({
+                url: '/cart/items',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    console.log('Success:', response);
+                    var countElement = form.find('span');
+                    countElement.text(response.count);
+
+                    // После изменения корзины проверяем баланс снова
+                    location.reload();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Функция проверки доступности кошелька и баланса
+        function checkWalletAndBalance() {
+            var form = $('.buyForm');
+            if (form.length === 0) return; // Если форма не существует
+
+            var total = parseFloat(form.find('input[name="total"]').val()) || 0;
+            var buyButton = $('.buyButton');
+
+            // Сначала проверяем доступность сервиса кошелька
+            $.ajax({
+                url: 'http://localhost:8081/wallet',
+                type: 'GET',
+                timeout: 5000, // Таймаут 5 секунд
+                success: function(response) {
+                    if (response && response.balance !== undefined) {
+                        var balance = parseFloat(response.balance);
+
+                        console.log('Баланс:', balance, 'Итого:', total);
+
+                        if (balance >= total && total > 0) {
+                            // Достаточно средств
+                            enableBuyButton(buyButton, true);
+                        } else {
+                            // Недостаточно средств
+                            enableBuyButton(buyButton, false);
+                            showBalanceMessage(balance, total);
+                        }
+                    } else {
+                        // Неверный формат ответа
+                        enableBuyButton(buyButton, false);
+                        showErrorMessage('Неверный формат ответа от сервиса кошелька');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Сервис недоступен или ошибка
+                    console.error('Ошибка при проверке баланса:', error);
+                    enableBuyButton(buyButton, false);
+
+                    if (status === 'timeout') {
+                        showErrorMessage('Сервис кошелька недоступен (таймаут)');
+                    } else if (xhr.status === 0) {
+                        showErrorMessage('Сервис кошелька недоступен');
+                    } else {
+                        showErrorMessage('Ошибка при проверке баланса: ' + (error || 'неизвестная ошибка'));
+                    }
+                }
+            });
+        }
+
+        // Включение/выключение кнопки "Купить"
+		function enableBuyButton(button, enable) {
+            if (enable) {
+                button.prop('disabled', false);
+                button.removeClass('btn-secondary');
+                button.addClass('btn-warning');
+                button.html('<i class="bi bi-cart-check"></i> Купить');
+            } else {
+                button.prop('disabled', true);
+                button.removeClass('btn-warning');
+                button.addClass('btn-secondary');
+                button.html('<i class="bi bi-cart-x"></i> Недоступно');
+            }
+        }
+
+        // Показать сообщение о балансе
+        function showBalanceMessage(balance, total) {
+            // Удаляем предыдущие сообщения
+            $('.balance-message').remove();
+
+            var message = '';
+            if (total === 0) {
+                message = 'Корзина пуста';
+            } else if (balance < total) {
+                message = 'Недостаточно средств. Баланс: ' + balance + ' руб., требуется: ' + total + ' руб.';
+            }
+
+            if (message) {
+                $('.buyForm').prepend(
+                    '<div class="alert alert-warning balance-message mb-2">' +
+                    message +
+                    '</div>'
+                );
+            }
+        }
+
+        // Показать сообщение об ошибке
+        function showErrorMessage(text) {
+            $('.error-message').remove();
+
+            $('.buyForm').prepend(
+                '<div class="alert alert-danger error-message mb-2">' +
+                text +
+                '</div>'
+            );
+        }
+
+        // Обработчик кнопки "Купить" с дополнительной проверкой
+        $('.buyButton').click(function() {
+            var form = $(this).closest('.buyForm');
+            var total = parseFloat(form.find('input[name="total"]').val()) || 0;
+
+            // Дополнительная проверка перед отправкой
+            if ($(this).prop('disabled')) {
+                alert('Покупка временно недоступна. Проверьте баланс или попробуйте позже.');
+                return false;
+            }
+
+            if (total <= 0) {
+                alert('Корзина пуста');
+                return false;
+            }
+
+            // Создаем объект с данными для отправки
+            var data = {
+                total: total
+            };
+
+            // Показываем индикатор загрузки
+            var originalText = $(this).html();
+            $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Обработка...');
+            $(this).prop('disabled', true);
+
+            $.ajax({
+                url: '/orders/buy',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(orderId) {
+                    window.location.href = '/orders/' + Number(orderId);
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    // Восстанавливаем кнопку
+                    $(this).html(originalText);
+                    $(this).prop('disabled', false);
+
+                    // Показываем сообщение об ошибке
+                    var errorMsg = 'Ошибка при покупке: ';
+                    if (error.responseJSON && error.responseJSON.message) {
+                        errorMsg += error.responseJSON.message;
+                    } else if (error.responseText) {
+                        errorMsg += error.responseText;
+                    } else {
+                        errorMsg += 'неизвестная ошибка';
+                    }
+
+                    alert(errorMsg);
+
+                    // Обновляем проверку баланса после ошибки
+                    checkWalletAndBalance();
+                }.bind(this) // Привязываем контекст для this внутри коллбэка
+            });
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+</body>
+
+</html>
