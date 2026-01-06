@@ -1,18 +1,12 @@
 spring:
-  jpa:
-    show-sql: true
-  h2:
-    console:
-      enabled: true
-  datasource:
-    url: jdbc:h2:mem:market
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-    hikari:
-      data-source-properties:
-        useUnicode: true
-        characterEncoding: UTF-8
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/market
+    username: postgres
+    password: postgres
+    driver: postgresql
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.yaml
+    url: jdbc:postgresql://localhost:5432/market
+    user: postgres
+    password: postgres
