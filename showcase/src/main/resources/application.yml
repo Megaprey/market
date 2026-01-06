@@ -6,8 +6,12 @@ spring:
       - classpath:application-db.yml
   data:
     redis:
-      host: 127.0.0.1
+      host: market-redis-1
       port: 6379
   cache:
     redis:
       time-to-live: 60000
+
+webservers:
+  wallet:
+    host: http://market-wallet-1:8081

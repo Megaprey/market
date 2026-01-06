@@ -1,6 +1,5 @@
 package ru.yandex.practicum.market.repository;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -10,8 +9,5 @@ import ru.yandex.practicum.market.entity.Item;
 @Repository
 public interface ItemRepository extends ReactiveCrudRepository<Item, Long> {
     Mono<Item> findById(Long id);
-    @Cacheable(
-            value = "items"
-    )
     Flux<Item> findAllByCheckOrder(boolean checkOrder);
 }

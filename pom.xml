@@ -158,11 +158,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!-- Главный класс вашего приложения -->
-					<mainClass>ru.yandex.practicum.market.MyMarketAppApplication</mainClass>
-
-
-
 					<!-- Исключаем devtools из финального JAR -->
 					<excludes>
 						<exclude>
@@ -172,11 +167,11 @@
 					</excludes>
 				</configuration>
 				<executions>
-				<execution>
-					<goals>
-						<goal>repackage</goal>
-					</goals>
-				</execution>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>

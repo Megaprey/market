@@ -9,5 +9,33 @@
     <artifactId>showcase</artifactId>
     <name>Archetype - showcase</name>
     <url>http://maven.apache.org</url>
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>
+                <!-- Главный класс вашего приложения -->
+                <mainClass>ru.yandex.practicum.market.MyMarketAppApplication</mainClass>
 
+
+
+                <!-- Исключаем devtools из финального JAR -->
+                <excludes>
+                    <exclude>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-devtools</artifactId>
+                    </exclude>
+                </excludes>
+            </configuration>
+            <executions>
+                <execution>
+                    <goals>
+                        <goal>repackage</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
 </project>

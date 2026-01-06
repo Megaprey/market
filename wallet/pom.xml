@@ -7,7 +7,6 @@
         <version>0.0.5</version>
     </parent>
     <artifactId>wallet</artifactId>
-    <packaging>war</packaging>
     <name>wallet Maven Webapp</name>
     <dependencies>
         <dependency>
@@ -19,5 +18,32 @@
     </dependencies>
     <build>
         <finalName>wallet</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Главный класс вашего приложения -->
+                    <mainClass>ru.igor.razzh.wallet.WalletApp</mainClass>
+
+
+
+                    <!-- Исключаем devtools из финального JAR -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-devtools</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
