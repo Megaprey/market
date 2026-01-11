@@ -1,0 +1,12 @@
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://postgres-wallet:5432/walletdb
+    username: postgres
+    password: postgres
+    driver: postgresql
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog.yaml
+    url: jdbc:postgresql://postgres-wallet:5432/walletdb
+    user: postgres
+    password: postgres
