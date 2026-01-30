@@ -6,12 +6,20 @@ spring:
       - classpath:application-db.yml
   data:
     redis:
-      host: market-redis-1
+      host: localhost
       port: 6379
   cache:
     redis:
       time-to-live: 60000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/market-webflux
 
 webservers:
   wallet:
-    host: http://market-wallet-1:8081
+    host: http:/localhost:8081
+
+server:
+  port: 8082

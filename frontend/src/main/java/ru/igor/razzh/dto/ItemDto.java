@@ -1,7 +1,6 @@
-package ru.yandex.practicum.market.dto;
+package ru.igor.razzh.dto;
 
 import lombok.Builder;
-import ru.yandex.practicum.market.util.Cart;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -20,7 +19,7 @@ public class ItemDto implements Serializable {
     public ItemDto() {}
 
     // Конструктор с параметрами (при необходимости)
-    public ItemDto(Long id, String title,  String description, BigDecimal price, String imgPath, int count) {
+    public ItemDto(Long id, String title, String description, BigDecimal price, String imgPath, int count) {
         this.id = id;
         this.title = title;
         this.description = description;

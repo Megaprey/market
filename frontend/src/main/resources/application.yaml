@@ -1,0 +1,37 @@
+server:
+  port: 8083
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  webflux:
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: frontend-service
+            client-secret: 0fD5laUHGLWULcU8PePkA4NwCOxwi7s2
+            authorization-grant-type: client_credentials
+            scope: openid
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/market-webflux
+  thymeleaf:
+    enabled: true
+    mode: HTML
+    encoding: UTF-8
+    servlet:
+      content-type: text/html;charset=UTF-8
+
+webservers:
+  wallet:
+    host: http://localhost:8082

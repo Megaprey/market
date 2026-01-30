@@ -1,12 +1,12 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://postgres-market:5432/market
+    url: r2dbc:postgresql://localhost:5432/market
     username: postgres
     password: postgres
     driver: postgresql
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog.yaml
-    url: jdbc:postgresql://postgres-market:5432/market
+    url: jdbc:postgresql://localhost:5432/market
     user: postgres
     password: postgres

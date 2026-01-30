@@ -1,4 +1,4 @@
-package ru.yandex.practicum.market.util;
+package ru.igor.razzh.util;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;

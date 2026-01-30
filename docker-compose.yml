@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.showcase
     ports:
-      - "8080:8080"
+      - "8082:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -84,6 +84,24 @@ services:
       - redis_data:/data # Persist data in a named volume
     networks:
       - market-network
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev
+    environment:
+      # Для входа в UI будут использоваться эти параметры
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      # В нашем случае Keycloak будет запущен на локальном порту 8080
+      - "8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5 
+
+        
 networks:
   market-network:
     driver: bridge
