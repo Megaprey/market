@@ -43,7 +43,6 @@ public class Paging {
     }
 
 
-    // Дополнительные полезные методы
     public boolean hasNext() {
         return pageNumber < totalPages;
     }

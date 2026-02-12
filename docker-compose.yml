@@ -5,7 +5,6 @@ services:
     image: postgres:16
     container_name: postgres-market
     environment:
-      POSTGRES_DB: market
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -13,6 +12,53 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  auth-server:
+    build: ./auth-server
+    container_name: auth-server
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/payment
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/payment
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://auth-server:9000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-server:
+        condition: service_started
+    restart: unless-stopped
+
+  market-app:
+    build: .
+    container_name: market-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/market
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/market
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_MARKET_CLIENT_ISSUER_URI: http://auth-server:9000
+      PAYMENT_SERVICE_URL: http://payment-service:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-server:
+        condition: service_started
+      payment-service:
+        condition: service_started
     restart: unless-stopped
 
 volumes:

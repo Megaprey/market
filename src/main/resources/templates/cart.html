@@ -17,8 +17,11 @@
                     <h2>
                         <span class="badge text-bg-success">Витрина магазина</span>
                     </h2>
-                    <a href="/orders" class="btn btn-secondary ms-auto bi bi-file-earmark-text"> Заказы</a>
+                    <span th:if="${authenticated}" class="text-muted ms-2" th:text="'Пользователь: ' + ${username}"></span>
+                    <a th:if="${authenticated}" href="/orders" class="btn btn-secondary ms-auto bi bi-file-earmark-text"> Заказы</a>
                     <a href="/items" class="btn btn-secondary bi bi-arrow-left-square"> Главная</a>
+                    <a th:if="${authenticated}" href="/logout" class="btn btn-outline-danger bi bi-box-arrow-right"> Выйти</a>
+                    <a th:unless="${authenticated}" href="/login" class="btn btn-primary bi bi-box-arrow-in-right"> Войти</a>
                 </div>
             </div>
         </div>
@@ -66,9 +69,8 @@
         $(document).ready(function() {
             $('.actionButton').click(function() {
                 var form = $(this).closest('.cartForm');
-                var action = $(this).val(); // Получаем значение кнопки
+                var action = $(this).val();
 
-                // Собираем данные из формы
                 var data = {
                     id: form.find('input[name="id"]').val(),
                     search: form.find('input[name="search"]').val(),
@@ -81,16 +83,9 @@
                 $.ajax({
                     url: '/cart/items',
                     type: 'POST',
-                    contentType: 'application/json', // Устанавливаем Content-Type
-                    data: JSON.stringify(data), // Преобразуем данные в JSON
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
                     success: function(response) {
-                        console.log('Success:', response);
-                        // Обновите интерфейс, если необходимо
-                        // Например, обновите количество товара
-                        var countElement = form.find('span');
-                        countElement.text(response.count); // Предполагается, что сервер возвращает новое количество
-
-                        // Перезагрузка страницы
                         location.reload();
                     },
                     error: function(error) {
@@ -100,11 +95,8 @@
             });
 
             $('.buyButton').click(function() {
-                // Получаем общую сумму (total) из сессии или другого источника
-                // Здесь предполагается, что total хранится в элементе с id="total"
                 var form = $(this).closest('.buyForm');
 
-                // Создаем объект с данными для отправки
                 var data = {
                     total: form.find('input[name="total"]').val()
                 };
@@ -112,15 +104,14 @@
                 $.ajax({
                     url: '/orders/buy',
                     type: 'POST',
-                    contentType: 'application/json', // Устанавливаем Content-Type
-                    data: JSON.stringify(data), // Преобразуем данные в JSON
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
                     success: function(orderId) {
                         window.location.href = '/orders/' + Number(orderId);
                     },
                     error: function(error) {
                         console.error('Error:', error);
-                        // Показать сообщение об ошибке
-                        alert('Ошибка при покупке: ' + error.responseText);
+                        alert('Ошибка при покупке: ' + (error.responseText || 'Недостаточно средств или ошибка сервиса платежей'));
                     }
                 });
             });

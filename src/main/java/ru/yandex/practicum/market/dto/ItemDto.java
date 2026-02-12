@@ -11,13 +11,11 @@ public class ItemDto {
     private String description;
     private BigDecimal price;
     private String imgPath;
-    private int count; // количество для корзины
+    private int count;
 
-    // Конструктор по умолчанию
     public ItemDto() {}
 
-    // Конструктор с параметрами (при необходимости)
-    public ItemDto(Long id, String title,  String description, BigDecimal price, String imgPath, int count) {
+    public ItemDto(Long id, String title, String description, BigDecimal price, String imgPath, int count) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -26,7 +24,6 @@ public class ItemDto {
         this.count = count;
     }
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }

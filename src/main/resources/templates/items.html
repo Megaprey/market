@@ -19,8 +19,11 @@
                     <h2>
                         <span class="badge text-bg-success">Витрина магазина</span>
                     </h2>
-                    <a href="/orders" class="btn btn-secondary ms-auto bi bi-file-earmark-text"> Заказы</a>
-                    <a href="/cart/items" class="btn btn-secondary bi bi-cart4"> Корзина</a>
+                    <span th:if="${authenticated}" class="text-muted ms-2" th:text="'Пользователь: ' + ${username}"></span>
+                    <a th:if="${authenticated}" href="/orders" class="btn btn-secondary ms-auto bi bi-file-earmark-text"> Заказы</a>
+                    <a th:if="${authenticated}" href="/cart/items" class="btn btn-secondary bi bi-cart4"> Корзина</a>
+                    <a th:if="${authenticated}" href="/logout" class="btn btn-outline-danger bi bi-box-arrow-right"> Выйти</a>
+                    <a th:unless="${authenticated}" href="/login" class="btn btn-primary ms-auto bi bi-box-arrow-in-right"> Войти</a>
                 </div>
             </div>
         </div>
@@ -63,7 +66,7 @@
                             <span class="badge text-bg-success justify-content-end" th:text="${item.getPrice()}+' руб.'"></span>
                         </h5>
                         <p class="card-text" th:text="${item.getDescription()}"></p>
-                        <form method="post" th:action="@{/items}" th:id="'cartForm_' + ${item.getId()}" class="cartForm">
+                        <form th:if="${authenticated}" method="post" th:action="@{/items}" th:id="'cartForm_' + ${item.getId()}" class="cartForm">
                             <div class="hstack gap-3">
                                 <input type="hidden" name="id" th:value="${item.getId()}">
                                 <input type="hidden" name="search" th:value="${search}">
@@ -96,9 +99,8 @@
         $(document).ready(function() {
             $('.actionButton').click(function() {
                 var form = $(this).closest('.cartForm');
-                var action = $(this).val(); // Получаем значение кнопки
+                var action = $(this).val();
 
-                // Собираем данные из формы
                 var data = {
                     id: form.find('input[name="id"]').val(),
                     search: form.find('input[name="search"]').val(),
@@ -114,17 +116,14 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function(response) {
-                        console.log('Success:', response);
-                        // Обновите интерфейс, если необходимо
-                        // Например, обновите количество товара
-                        var countElement = form.find('span');
-                        countElement.text(response.count); // Предполагается, что сервер возвращает новое количество
-
-                        // Перезагрузка страницы
                         location.reload();
                     },
                     error: function(error) {
-                        console.error('Error:', error);
+                        if (error.status === 401 || error.status === 403) {
+                            window.location.href = '/login';
+                        } else {
+                            console.error('Error:', error);
+                        }
                     }
                 });
             });

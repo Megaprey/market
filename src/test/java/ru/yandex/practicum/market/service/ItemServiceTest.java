@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,9 @@ class ItemServiceTest {
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @MockBean
+    private PaymentClient paymentClient;
 
     private Cart cart;
 
@@ -71,10 +75,8 @@ class ItemServiceTest {
 
     @Test
     void getPageItems_shouldReturnAllItemsWithoutSearch() {
-        // when
         Mono<Page<ItemDto>> pageMono = itemService.getPageItems(cart, 0, 10, null, "NO");
 
-        // then
         StepVerifier.create(pageMono)
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(3);
@@ -85,10 +87,8 @@ class ItemServiceTest {
 
     @Test
     void getPageItems_withSearchByTitle_shouldReturnMatchingItems() {
-        // when
         Mono<Page<ItemDto>> pageMono = itemService.getPageItems(cart, 0, 10, "мяч", "NO");
 
-        // then
         StepVerifier.create(pageMono)
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(1);
@@ -99,10 +99,8 @@ class ItemServiceTest {
 
     @Test
     void getPageItems_withSearchByDescription_shouldReturnMatchingItems() {
-        // when
         Mono<Page<ItemDto>> pageMono = itemService.getPageItems(cart, 0, 10, "настольный", "NO");
 
-        // then
         StepVerifier.create(pageMono)
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(2);
@@ -114,10 +112,8 @@ class ItemServiceTest {
 
     @Test
     void getPageItems_withSortPrice_shouldReturnSortedByPriceAsc() {
-        // when
         Mono<Page<ItemDto>> pageMono = itemService.getPageItems(cart, 0, 10, null, "PRICE");
 
-        // then
         StepVerifier.create(pageMono)
                 .assertNext(page -> {
                     assertThat(page.getContent()).hasSize(3);

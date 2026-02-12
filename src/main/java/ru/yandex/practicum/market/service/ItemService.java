@@ -29,10 +29,8 @@ public class ItemService {
     }
 
     public Mono<Page<ItemDto>> getPageItems(Cart cart, int page, int size, String search, String sort) {
-        // Загружаем только активные товары
         Flux<Item> itemFlux = itemRepository.findAllByCheckOrder(true);
 
-        // Фильтрация по поиску
         if (search != null && !search.trim().isEmpty()) {
             String lowerSearch = search.toLowerCase();
             Predicate<Item> matchesSearch = item ->
@@ -41,10 +39,8 @@ public class ItemService {
             itemFlux = itemFlux.filter(matchesSearch);
         }
 
-        // Преобразуем в DTO
         Flux<ItemDto> dtoFlux = itemFlux.map(item -> mapItemToItemDto(item, cart));
 
-        // Сортировка
         Comparator<ItemDto> comparator = switch (sort) {
             case "ALPHA" -> Comparator.comparing(ItemDto::getTitle, String.CASE_INSENSITIVE_ORDER);
             case "PRICE" -> Comparator.comparing(ItemDto::getPrice);
@@ -53,7 +49,6 @@ public class ItemService {
 
         dtoFlux = dtoFlux.sort(comparator);
 
-        // Пагинация: собираем в список и режем по странице
         return dtoFlux
                 .collectList()
                 .map(items -> getPageFromListItems(items, page, size));

@@ -18,6 +18,8 @@ import ru.yandex.practicum.market.util.Cart;
 import ru.yandex.practicum.market.util.Paging;
 import ru.yandex.practicum.market.util.Utils;
 
+import java.security.Principal;
+
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 
@@ -33,34 +35,32 @@ public class CartController {
             @RequestParam(defaultValue = "10") int pageSize,
             Model model,
             ServerWebExchange exchange) {
-        return exchange.getSession()
-                .flatMap(session -> {
-                    // Получаем корзину из сессии или создаем новую
-                    Cart cartFromSession = session.getAttribute("cart");
-                    Cart cart = cartFromSession != null ? cartFromSession : new Cart();
+        return exchange.getPrincipal()
+                .map(Principal::getName)
+                .flatMap(username -> {
+                    model.addAttribute("authenticated", true);
+                    model.addAttribute("username", username);
 
+                    return exchange.getSession()
+                            .flatMap(session -> {
+                                Cart cart = getCartFromSession(session);
 
+                                return itemService.getPageItemsInCart(cart, pageNumber - 1, pageSize)
+                                        .flatMap(itemPage -> {
+                                            session.getAttributes().put("cart", cart);
+                                            Paging paging = new Paging(
+                                                    itemPage.getNumber() + 1,
+                                                    pageSize,
+                                                    itemPage.getTotalElements()
+                                            );
 
-                    // Получаем страницу товаров
-                    return itemService.getPageItemsInCart(cart, pageNumber - 1, pageSize)
-                            .flatMap(itemPage -> {
-                                // Сохраняем корзину обратно в сессию
-                                session.getAttributes().put("cart", cart);
-                                // Создаем пагинацию
-                                Paging paging = new Paging(
-                                        itemPage.getNumber() + 1,
-                                        pageSize,
-                                        itemPage.getTotalElements()
-                                );
+                                            model.addAttribute("items", itemPage.getContent());
+                                            model.addAttribute("paging", paging);
+                                            model.addAttribute("total", Utils.getTotalPriceFromItemsDto(itemPage));
+                                            model.addAttribute("cart", cart);
 
-                                // Устанавливаем атрибуты модели
-                                model.addAttribute("items", itemPage.getContent());
-                                model.addAttribute("paging", paging);
-                                model.addAttribute("total", Utils.getTotalPriceFromItemsDto(itemPage));
-                                model.addAttribute("cart", cart);
-
-                                // Возвращаем имя представления
-                                return Mono.just("cart");
+                                            return Mono.just("cart");
+                                        });
                             });
                 });
     }
@@ -72,7 +72,7 @@ public class CartController {
             ServerWebExchange exchange) {
         return exchange.getSession()
                 .flatMap(session -> {
-                    Cart cart = session.getAttribute("cart");
+                    Cart cart = getCartFromSession(session);
 
                     return itemService.getPageItemsInCart(cart, handleItemDto.getPageNumber() - 1, handleItemDto.getPageSize())
                             .flatMap(itemPage -> {
@@ -87,17 +87,11 @@ public class CartController {
 
                                 return Mono.just("cart");
                             });
-
                 });
     }
 
-    private void setModelAttribute(Model model, Page<ItemDto> itemPage, int pageSize) {
-        Paging paging = new Paging(itemPage.getNumber() + 1,
-                pageSize,
-                itemPage.getTotalElements());
-        model.addAttribute("items", itemPage.getContent());
-        model.addAttribute("total", Utils.getTotalPriceFromItemsDto(itemPage));
-        model.addAttribute("paging", paging);
+    private Cart getCartFromSession(org.springframework.web.server.WebSession session) {
+        Cart cart = session.getAttribute("cart");
+        return cart != null ? cart : new Cart();
     }
-
 }
