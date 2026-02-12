@@ -4,3 +4,18 @@ spring:
   config:
     import:
       - classpath:application-db.yml
+  security:
+    oauth2:
+      client:
+        registration:
+          market-client:
+            client-id: market-client
+            client-secret: market-secret
+            authorization-grant-type: client_credentials
+            scope: payment.read,payment.write
+        provider:
+          market-client:
+            issuer-uri: http://localhost:9000
+
+payment-service:
+  url: http://localhost:8081

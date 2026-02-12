@@ -16,8 +16,11 @@
                     <h2>
                         <span class="badge text-bg-success">Витрина магазина</span>
                     </h2>
-                    <a href="/cart/items" class="btn btn-secondary bi bi-cart4 ms-auto"> Корзина</a>
+                    <span th:if="${authenticated}" class="text-muted ms-2" th:text="'Пользователь: ' + ${username}"></span>
+                    <a th:if="${authenticated}" href="/cart/items" class="btn btn-secondary bi bi-cart4 ms-auto"> Корзина</a>
                     <a href="/items" class="btn btn-secondary bi bi-arrow-left-square"> Главная</a>
+                    <a th:if="${authenticated}" href="/logout" class="btn btn-outline-danger bi bi-box-arrow-right"> Выйти</a>
+                    <a th:unless="${authenticated}" href="/login" class="btn btn-primary bi bi-box-arrow-in-right"> Войти</a>
                 </div>
             </div>
         </div>
@@ -34,6 +37,11 @@
                         <b th:text="${'Сумма: '+order.getTotalSum()}+' руб.'"></b>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="row p-2" th:if="${orders.isEmpty()}">
+            <div class="col">
+                <p class="text-muted">У вас пока нет заказов.</p>
             </div>
         </div>
     </div>

@@ -1,11 +1,10 @@
 package ru.yandex.practicum.market.util;
-import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-@Component
-public class Cart {
+public class Cart implements Serializable {
     private HashMap<Long, Short>  mapItemInCart = new HashMap<>();
 
     public void addItem(Long id, Short countItem) {

@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0_1__CREATE_ACCOUNTS
+      author: Razzhivin Igor
+      changes:
+        - sqlFile:
+            path: db/changelog/migration/V1.0.0_1__CREATE_ACCOUNTS.sql
+        - tagDatabase:
+            tag: 1

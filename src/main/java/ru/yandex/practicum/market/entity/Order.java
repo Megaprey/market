@@ -26,8 +26,9 @@ public class Order {
     @Column("total_sum")
     private BigDecimal totalSum;
 
+    @Column("user_id")
+    private Long userId;
+
     @Transient
     private List<Item> items;
-
-
 }
