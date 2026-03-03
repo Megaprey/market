@@ -1,6 +1,38 @@
-version: '3.8'
-
 services:
+  showcase:
+    container_name: market-showcase-1
+    build:
+      context: .
+      dockerfile: Dockerfile.showcase
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - market-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  wallet:
+    container_name: market-wallet-1
+    build:
+      context: .
+      dockerfile: Dockerfile.wallet
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - market-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
   postgres:
     image: postgres:16
     container_name: postgres-market
@@ -11,9 +43,72 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data:/var/lib/postgresql/data  
+      - ./postgres-config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro  
+    command: >
+      postgres
+      -c listen_addresses='*'
+      -c hba_file=/etc/postgresql/pg_hba.conf
     restart: unless-stopped
+    networks:
+    - market-network
+
+  postgres2:
+    image: postgres:16
+    container_name: postgres-wallet
+    environment:
+      POSTGRES_DB: walletdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - ./postgres-wallet-config/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres-data2:/var/lib/postgresql/data
+      - ./postgres-config/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    command: >
+      postgres
+      -c listen_addresses='*'
+      -c hba_file=/etc/postgresql/pg_hba.conf
+    restart: unless-stopped
+    networks:
+      - market-network
+
+  redis:
+    image: redis:7.4-alpine # Use the official Redis image, alpine is lightweight
+    container_name: market-redis-1
+    restart: always
+    ports:
+      - "6379:6379" # Maps port 6379 on the host to port 6379 in the container
+    volumes:
+      - redis_data:/data # Persist data in a named volume
+    networks:
+      - market-network
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev
+    environment:
+      # Для входа в UI будут использоваться эти параметры
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      # В нашем случае Keycloak будет запущен на локальном порту 8080
+      - "8080:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5 
+
+        
+networks:
+  market-network:
+    driver: bridge
 
 volumes:
   postgres-data:
+  postgres-data2:
+  redis_data:
+    driver: local
+
